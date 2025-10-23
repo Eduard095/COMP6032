@@ -1,3 +1,4 @@
+#testing
 import pygame
 import threading
 import time
@@ -294,7 +295,6 @@ if fareFile is not None: # BUGFIX handle no open fare file to record ADR 21 Octo
    fareFile.close()
 pygame.quit()
 sys.exit()
-
 
 
 
