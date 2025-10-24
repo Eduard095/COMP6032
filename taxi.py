@@ -328,43 +328,79 @@ class Taxi:
       ''' HERE IS THE PART THAT YOU NEED TO MODIFY
       '''
 
-      # TODO
-      # this function should build your route and fill the _path list for each new
-      # journey. Below is a naive depth-first search implementation. You should be able
-      # to do much better than this!
       def _planPath(self, origin, destination, **args):
-          # the list of explored paths. Recursive invocations pass in explored as a parameter
-          if 'explored' not in args:
-             args['explored'] = {}
-          # add this origin to the explored list
-          # explored is a dict purely so we can hash its index for fast lookup, so its value doesn't matter
-          args['explored'][origin] = None 
-          # the actual path we are going to generate
-          path = [origin]
-          # take the next node in the frontier, and expand it depth-wise               
-          if origin in self._map:
-             # the frontier of unexplored paths (from this Node
-             frontier = [node for node in self._map[origin].keys() if node not in args['explored']]
-             # recurse down to the next node. This will automatically create a depth-first
-             # approach because the recursion won't bottom out until no more frontier nodes
-             # can be generated 
-             for nextNode in frontier:
-                 path = path + self._planPath(nextNode, destination, explored=args['explored'])
-                 # stop early as soon as the destination has been found by any route.
-                 if destination in path:
-                    # validate path
-                    if len(path) > 1:
-                       try:
-                           # use a generator expression to find any invalid nodes in the path
-                           badNode = next(pnode for pnode in path[1:] if pnode not in self._map[path[path.index(pnode)-1]].keys())
-                           raise IndexError("Invalid path: no route from ({0},{1}) to ({2},{3} in map".format(self._map[path.index(pnode)-1][0], self._map[path.index(pnode)-1][1], pnode[0], pnode[1]))
-                       except StopIteration:
-                           pass
-                    return path
-          # didn't reach the destination from any reachable node
-          # no need, therefore, to expand the path for the higher-level call, this is a dead end.
-          return [] 
-                
+
+         if 'explored' not in args:
+            args['explored'] = {}
+         args['explored'][origin] = None
+
+         if origin == destination:
+            return [origin]
+         if origin not in self._map or destination not in self._map:
+            return []
+         
+         distances = {}       
+         previous = {}        
+         for node in self._map:
+            distances[node] = float('inf')  
+            previous[node] = None
+         distances[origin] = 0 
+
+    
+         pq = [(0, origin)]  
+         visited = set()
+
+         while pq:
+            current_dist, current_node = heapq.heappop(pq)
+            
+            if current_node in visited:
+                  continue
+            visited.add(current_node)
+
+            if current_node == destination:
+                  break
+
+            for OtherNode, info in self._map[current_node].items():
+                  
+                  if isinstance(info, (tuple, list)) and len(info) >= 2:
+                     travel_time = info[1]
+                  else:
+                     travel_time = info  
+
+                 
+                  new_dist = current_dist + travel_time
+
+                  
+                  if new_dist < distances[OtherNode]:
+                     distances[OtherNode] = new_dist
+                     previous[OtherNode] = current_node
+                     heapq.heappush(pq, (new_dist, OtherNode))
+
+  
+         path = []
+         node = destination
+         if distances[destination] == float('inf'):
+            return [] 
+
+         while node is not None:
+            path.append(node)
+            node = previous[node]
+         path.reverse()
+
+         for i in range(1, len(path)):
+            if path[i] not in self._map.get(path[i - 1], {}):
+                  return []
+         return path
+
+
+
+      
+      
+
+
+
+
+
       # TODO
       # this function decides whether to offer a bid for a fare. In general you can consider your current position, time,
       # financial state, the collection and dropoff points, the time the fare called - or indeed any other variable that

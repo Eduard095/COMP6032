@@ -43,10 +43,14 @@ def runRoboUber(worldX,worldY,runTime,stop,junctions=None,streets=None,interpola
    taxi3 = taxi.Taxi(world=svcArea,taxi_num=103,service_area=svcMap,start_point=(0,35))
 
    taxis = [taxi0,taxi1,taxi2,taxi3]
+   for t in taxis:
+    print(f"Taxi {t.number} earned £{t._account:.2f}")
+
 
    # and a dispatcher
    print("Adding a dispatcher")
    dispatcher0 = dispatcher.Dispatcher(parent=svcArea,taxis=taxis)
+   print(f"Dispatcher total revenue: £{dispatcher0._revenue:.2f}")
 
    # who should be on duty
    svcArea.addDispatcher(dispatcher0)
@@ -71,6 +75,9 @@ def runRoboUber(worldX,worldY,runTime,stop,junctions=None,streets=None,interpola
             if threadTime != svcArea.simTime:
                threadTime += 1
             time.sleep(1)        # change this value to speed up the simulation. Smaller times = faster runs
+   for t in taxis:
+    print(f"Taxi {t.number} earned £{t._account:.2f}")
+   print(f"Dispatcher total revenue: £{dispatcher0._revenue:.2f}")
 
 # file to record appearing Fares. You can use similar instrumentation to record just about anything else of interest
 if recordFares:
@@ -290,6 +297,7 @@ for run in range(numDays):
 
    roboUber.join() # wait 'til the simulation thread ends (BUGFIX 26 Nov 2024 ADR)
    print("end of day: {0}".format(run))
+  
 # reached the end of the loop. Next day (or exit)
 if fareFile is not None: # BUGFIX handle no open fare file to record ADR 21 October 2025
    fareFile.close()

@@ -33,6 +33,7 @@ class Fare:
       def dropOff(self):
           self._enroute = False
           self._origin = self._destination
+          print(f" Fare completed successfully.")
 
       # inform the fare of the expected price for the ride
       def setPrice(self, price):
@@ -44,7 +45,7 @@ class Fare:
           if ((expectedTime2Dest < 0) or
               (self._maxPrice is None and price > 10*expectedTime2Dest) or
               (self._maxPrice is not None and price > self._maxPrice)) :
-             print("Fare ({0},{1}) abandoned because expectedTime2Dest was {2} and price was {3}".format(self.origin[0],self.origin[1],expectedTime2Dest, self._price))
+             print("Fare ({0},{1}) abandoned because expectedTime2Dest was {2} and price was {3}".format(self.origin[0],self.origin[1],expectedTime2Dest, price))
              self._waitTime = 0
           # otherwise, the price to be paid is as quoted.
           self._price = price
